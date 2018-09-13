@@ -1,6 +1,6 @@
 package Services;
 
-import entities.Person;
+import entities.Poll;
 
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaQuery;
@@ -8,16 +8,16 @@ import java.util.List;
 
 public class PersonDao {
     private static EntityManagerFactory emf;
-    private Class<Person> entityClass;
+    private Class<Poll> entityClass;
 
-    public PersonDao(Class<Person> entityClass) {
+    public PersonDao(Class<Poll> entityClass) {
         if(emf == null){
             emf = Persistence.createEntityManagerFactory("Persistence");
         }
         this.entityClass = entityClass;
     }
 
-    public void persist (Person entity){
+    public void persist (Poll entity){
         EntityManager em = emf.createEntityManager();
 
         try{
@@ -38,7 +38,7 @@ public class PersonDao {
         }
     }
 
-    public Person find(long id) {
+    public Poll find(long id) {
         EntityManager em = emf.createEntityManager();
         try {
             return em.find(entityClass, id);
@@ -50,7 +50,7 @@ public class PersonDao {
         return null;
     }
 
-    public void update(Person entity) {
+    public void update(Poll entity) {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
@@ -64,7 +64,7 @@ public class PersonDao {
         }
     }
 
-    public void remove(Person entity) {
+    public void remove(Poll entity) {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
@@ -79,10 +79,10 @@ public class PersonDao {
         }
     }
 
-    public List<Person> findAll() {
+    public List<Poll> findAll() {
         EntityManager em = emf.createEntityManager();
         try{
-            CriteriaQuery<Person> criteriaQuery = em.getCriteriaBuilder().createQuery(entityClass);
+            CriteriaQuery<Poll> criteriaQuery = em.getCriteriaBuilder().createQuery(entityClass);
             criteriaQuery.select(criteriaQuery.from(entityClass));
             return em.createQuery(criteriaQuery).getResultList();
         } finally {

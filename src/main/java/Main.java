@@ -1,7 +1,7 @@
 import Services.BootStrapServices;
 import Services.PersonDao;
 import encapsulation.EducationLevel;
-import entities.Person;
+import entities.Poll;
 import freemarker.template.Configuration;
 import spark.ModelAndView;
 import spark.template.freemarker.FreeMarkerEngine;
@@ -20,12 +20,11 @@ public class Main {
 
         BootStrapServices.getInstance().init();
 
-
         staticFiles.location("/public");
 
         port(getHerokuAsignatedPort());
 
-        personDao = new PersonDao(Person.class);
+        personDao = new PersonDao(Poll.class);
 
         Configuration configuration = new Configuration(Configuration.VERSION_2_3_23);
         configuration.setClassForTemplateLoading(Main.class, "/templates");
@@ -42,30 +41,30 @@ public class Main {
         }, freemarkerEngine);
 
         post("personInfo", (request,response) ->{
-            Person person = new Person();
+            Poll poll = new Poll();
             EducationLevel educationLevel = EducationLevel.valueOf(request.queryParams("education").toUpperCase());
-            person.setFirstName(request.queryParams("firstName"));
-            person.setLastName(request.queryParams("lastName"));
+            poll.setFirstName(request.queryParams("firstName"));
+            poll.setLastName(request.queryParams("lastName"));
 
             switch (educationLevel){
                 case PRIMARY:
-                    person.setEducationLevel(EducationLevel.PRIMARY);
+                    poll.setEducationLevel(EducationLevel.PRIMARY);
                     break;
                 case SECONDARY:
-                    person.setEducationLevel(EducationLevel.SECONDARY);
+                    poll.setEducationLevel(EducationLevel.SECONDARY);
                     break;
                 case UNIVERSITY:
-                    person.setEducationLevel(EducationLevel.UNIVERSITY);
+                    poll.setEducationLevel(EducationLevel.UNIVERSITY);
                     break;
                 case MASTER:
-                    person.setEducationLevel(EducationLevel.MASTER);
+                    poll.setEducationLevel(EducationLevel.MASTER);
                     break;
                 case DOCTORATE:
-                    person.setEducationLevel(EducationLevel.DOCTORATE);
+                    poll.setEducationLevel(EducationLevel.DOCTORATE);
                     break;
             }
-            person.setSector(request.queryParams("sector"));
-            personDao.persist(person);
+            poll.setSector(request.queryParams("sector"));
+            personDao.persist(poll);
             response.redirect("/");
             return null;
         });

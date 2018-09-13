@@ -8,7 +8,7 @@ import javax.persistence.Id;
 
 
 @Entity
-public class Person {
+public class Poll {
     @Id
     @GeneratedValue
     private long id;
@@ -22,16 +22,16 @@ public class Person {
 
     private EducationLevel educationLevel;
 
-    public Person() {
+    public Poll() {
     }
 
-    /*public Person(String name, String sector, EducationLevel educationLevel) {
+    /*public Poll(String name, String sector, EducationLevel educationLevel) {
         this.name = name;
         this.sector = sector;
         this.educationLevel = educationLevel;
     }*/
 
-    public Person(String firstName, String lastName, String sector, EducationLevel educationLevel) {
+    public Poll(String firstName, String lastName, String sector, EducationLevel educationLevel) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.sector = sector;
