@@ -34,13 +34,13 @@ public class Main {
 
         get("/", (req, res) -> "Hello world");
 
-        get("/personInfo",(request,response)->{
+        get("/poll",(request,response)->{
             Map<String, Object> model = new HashMap<>();
             model.put("title", "Información sobre la persona");
             return new ModelAndView(model,"form.ftl");
         }, freemarkerEngine);
 
-        post("personInfo", (request,response) ->{
+        post("/poll", (request,response) ->{
             Poll poll = new Poll();
             EducationLevel educationLevel = EducationLevel.valueOf(request.queryParams("education").toUpperCase());
             poll.setFirstName(request.queryParams("firstName"));
