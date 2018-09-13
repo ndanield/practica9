@@ -1,4 +1,4 @@
-<form action="/poll" method="post" autocomplete="off">
+<form action="/" method="post" autocomplete="off">
     <fieldset>
         <div class="form-row ">
             <label for="firstName" class="col-sm-4 col-form-label"> Nombres</label>

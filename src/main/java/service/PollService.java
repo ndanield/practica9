@@ -1,4 +1,4 @@
-package Services;
+package service;
 
 import entities.Poll;
 
@@ -6,11 +6,11 @@ import javax.persistence.*;
 import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
 
-public class PersonDao {
+public class PollService {
     private static EntityManagerFactory emf;
     private Class<Poll> entityClass;
 
-    public PersonDao(Class<Poll> entityClass) {
+    public PollService(Class<Poll> entityClass) {
         if(emf == null){
             emf = Persistence.createEntityManagerFactory("Persistence");
         }

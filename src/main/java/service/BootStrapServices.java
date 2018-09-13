@@ -1,4 +1,4 @@
-package Services;
+package service;
 
 import org.h2.tools.Server;
 
