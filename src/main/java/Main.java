@@ -37,7 +37,7 @@ public class Main {
         get("/poll",(request,response)->{
             Map<String, Object> model = new HashMap<>();
             model.put("title", "Información sobre la persona");
-            return new ModelAndView(model,"form.ftl");
+            return new ModelAndView(model,"personform.ftl");
         }, freemarkerEngine);
 
         post("/poll", (request,response) ->{
