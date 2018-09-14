@@ -6,14 +6,14 @@
 
     <div id="collapsibleNavbar" class="collapse navbar-collapse">
         <ul class="navbar-nav">
-            <li class="nav-item active">
-                <a class="nav-link" href="/poll"> Encuestar</a>
+            <li class="nav-item">
+                <a class="nav-link" href="/"> Inicio</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/polls"> Encuestas</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/locations"> Ubicaciones</a>
+                <a class="nav-link" href="/location"> Ubicaciones</a>
             </li>
         </ul>
     </div>

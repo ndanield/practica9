@@ -23,8 +23,11 @@ public class Main {
         configuration.setClassForTemplateLoading(Main.class, "/templates");
         freemarkerEngine = new FreeMarkerEngine(configuration);
 
-        get("/", PollController.pollCreateGet);
-        post("/", PollController.pollCreatePost);
+        get("/", PollController.pollStagedGet);
+        get("/poll", PollController.pollCreateGet);
+        post("/poll", PollController.pollCreatePost);
+        get("/location", PollController.pollLocationGet);
+        get("/polls", PollController.pollListingGet);
 
     }
     private static int getHerokuAsignatedPort(){

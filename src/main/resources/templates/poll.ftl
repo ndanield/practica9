@@ -39,7 +39,7 @@
                 </div>
             </fieldset>
             <div class="card-footer">
-                <button class="btn btn-success mx-auto" type="submit">Enviar</button>
+                <button class="btn btn-success mx-auto" type="submit" onclick="alert('Formulario enviado')">Enviar</button>
             </div>
         </form>
     </div>

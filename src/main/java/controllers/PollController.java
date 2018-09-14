@@ -10,14 +10,22 @@ import spark.Route;
 import util.Path;
 import main.Main;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class PollController {
+
     private static PollService pollService = new PollService(Poll.class);
 
+    public static Route pollStagedGet = (Request req, Response res) -> {
+        Map<String, Object> model = new HashMap<>();
+        model.put("title", "Encuestas en fila");
+        return Main.freemarkerEngine.render(new ModelAndView(model, Path.POLL_STAGED));
+    };
+
     public static Route pollCreateGet = (Request req, Response res) -> {
-        Map<Object, String> model = new HashMap<>();
+        Map<String, Object> model = new HashMap<>();
         model.put("title", "Encuesta");
         return Main.freemarkerEngine.render(new ModelAndView(model, Path.POLL));
     };
@@ -48,6 +56,9 @@ public class PollController {
         }
 
         poll.setSector(req.queryParams("sector"));
+        poll.setDate(new Date());
+        //  Agregar la latitud y longitud
+
         pollService.persist(poll);
 
         res.redirect("/");
@@ -56,17 +67,19 @@ public class PollController {
     };
 
     public static Route pollListingGet = (Request req, Response res) -> {
-        Map<Object, String> model = new HashMap<>();
+        Map<String, Object> model = new HashMap<>();
 
-
+        model.put("title", "Encuestas");
+        model.put("polls", pollService.findAll());
 
         return Main.freemarkerEngine.render(new ModelAndView(model, Path.POLL_LISTING));
     };
 
     public static Route pollLocationGet = (req, res) -> {
-        Map<Object, String> model = new HashMap<>();
+        Map<String, Object> model = new HashMap<>();
 
-
+        model.put("title", "Ubicaciones");
+        model.put("polls", pollService.findAll());
 
         return Main.freemarkerEngine.render(new ModelAndView(model, Path.POLL_LOCATION));
     };
