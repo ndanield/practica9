@@ -2,44 +2,44 @@
 var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB
 
 //indicamos el nombre y la versión
-var dataBase = indexedDB.open("programacion_web", 1);
+var dataBase = indexedDB.open("offline_db", 1);
 
 
 //se ejecuta la primera vez que se crea la estructura
 //o se cambia la versión de la base de datos.
 dataBase.onupgradeneeded = function (e) {
-    console.log("Creando la estructura de la tabla");
+    console.log("Creating polls table");
 
     //obteniendo la conexión activa
     active = dataBase.result;
 
     //creando la colección:
     //En este caso, la colección, tendrá un ID autogenerado.
-    var estudiantes = active.createObjectStore("estudiantes", { keyPath : 'matricula', autoIncrement : false });
-    var profesores = active.createObjectStore("profesores", { keyPath : 'id', autoIncrement : true });
+    var polls = active.createObjectStore("polls", { keyPath : 'id', autoIncrement : true });
+    // var profesores = active.createObjectStore("profesores", { keyPath : 'id', autoIncrement : true });
 
     //creando los indices. (Dado por el nombre, campo y opciones)
-    estudiantes.createIndex('por_indice', 'indice', {unique : false});
-    profesores.createIndex('por_cedula', 'cedula', {unique : true});
+    polls.createIndex('poll_index', 'index', {unique : true});
+    // profesores.createIndex('por_cedula', 'cedula', {unique : true});
 
 };
 
 //El evento que se dispara una vez, lo
 dataBase.onsuccess = function (e) {
-    console.log('Proceso ejecutado de forma correctamente');
+    console.log('Process executed successfully');
 };
 
 dataBase.onerror = function (e) {
-    console.error('Error en el proceso: '+e.target.errorCode);
+    console.error('Something happened in the process: '+e.target.errorCode);
 };
 
 
-function agregarEstudiante() {
+function addPoll() {
     var dbActiva = dataBase.result; //Nos retorna una referencia al IDBDatabase.
 
     //Para realizar una operación de agreagr, actualización o borrar.
     // Es necesario abrir una transacción e indicar un modo: readonly, readwrite y versionchange
-    var transaccion = dbActiva.transaction(["estudiantes"], "readwrite");
+    var transaccion = dbActiva.transaction(["polls"], "readwrite");
 
     //Manejando los errores.
     transaccion.onerror = function (e) {
@@ -47,20 +47,21 @@ function agregarEstudiante() {
     };
 
     transaccion.oncomplete = function (e) {
-        document.querySelector("#matricula").value = '';
-        alert('Objeto agregado correctamente');
+        // document.querySelector("#matricula").value = '';
+        // alert('Object added successfully');
+        console.log("Object added successfully");
     };
 
     //abriendo la colección de datos que estaremos usando.
-    var estudiantes = transaccion.objectStore("estudiantes");
+    var polls = transaccion.objectStore("polls");
 
     //Para agregar se puede usar add o put, el add requiere que no exista
     // el objeto.
-    var request = estudiantes.put({
-        matricula: document.querySelector("#matricula").value,
-        nombre: document.querySelector("#nombre").value,
-        carrera: document.querySelector("#carrera").value,
-        indice: document.querySelector("#indice").value
+    var request = polls.put({
+        firstName: document.querySelector("#firstName").value,
+        lastName: document.querySelector("#lastName").value,
+        sector: document.querySelector("#sector").value,
+        education: document.querySelector("#education").value
     });
 
     request.onerror = function (e) {
@@ -70,11 +71,11 @@ function agregarEstudiante() {
     };
 
     request.onsuccess = function (e) {
-        console.log("Datos Procesado con exito");
-        document.querySelector("#matricula").value = "";
-        document.querySelector("#nombre").value = "";
-        document.querySelector("#carrera").value = "";
-        document.querySelector("#indice").value = "";
+        console.log("Data temporary persisted successfully");
+        document.querySelector("#firstName").value = "";
+        document.querySelector("#lastName").value = "";
+        document.querySelector("#sector").value = "";
+        document.querySelector("#education").value = "";
     };
 
 
