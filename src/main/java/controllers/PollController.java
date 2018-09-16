@@ -62,7 +62,7 @@ public class PollController {
         pollService.persist(poll);
 
         res.redirect("/");
-        return null;
+        return "Encuesta registrado con exito:\nFecha: "+poll.getDate()+"\nNombre: "+poll.getFirstName()+"\nSector: "+poll.getSector()+"\n";
 
     };
 

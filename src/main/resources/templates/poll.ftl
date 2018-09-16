@@ -2,7 +2,7 @@
 
 <@b.base>
     <div class="card mx-auto limit-width-on-lg-screen">
-        <form action="/poll" method="post" autocomplete="off">
+        <#--<form action="/poll" method="post" autocomplete="off">-->
             <fieldset class="card-body">
                 <div class="form-group row">
                     <label for="firstName" class="col-sm-4 col-form-label"> Nombres</label>
@@ -41,7 +41,7 @@
             <div class="card-footer">
                 <button class="btn btn-success mx-auto" type="submit" onclick="alert('Formulario enviado'); addPoll()">Enviar</button>
             </div>
-        </form>
+        <#--</form>-->
     </div>
 <script src="/js/savePollTest.js"></script>
 </@b.base>
