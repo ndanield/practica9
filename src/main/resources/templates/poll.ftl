@@ -43,5 +43,5 @@
             </div>
         <#--</form>-->
     </div>
-<script src="/js/savePollTest.js"></script>
+<script src="/js/savePoll.js"></script>
 </@b.base>
