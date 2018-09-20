@@ -14,29 +14,29 @@
 
 <script>
     function initMap() {
-        let coords = [];
+        var coords = [];
         <#list polls as poll>
              coords.push( { lat: ${poll.latitude}, lng: ${poll.longitude} } );
         </#list>
 
         console.log(coords);
 
-        let mapProp = {
+        var mapProp = {
             center: {lat: 19.470587, lng: -70.693633},
             zoom: 8,
             streetViewControl: false,
             fullscreenControl: false
         };
-        let map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+        var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
 
-        for(let coord of coords) {
-            let marker = new google.maps.Marker({position: coord});
+        for(var coord in coords) {
+            var marker = new google.maps.Marker({position: coord});
             marker.setMap(map);
         }
     }
 
     function placeMarker(map, location) {
-        let marker = new google.maps.Marker({
+        var marker = new google.maps.Marker({
             position: location,
             map: map
         });

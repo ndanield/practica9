@@ -1,8 +1,12 @@
-var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB
+// if (!window.indexedDB) {
+//     window.alert("Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.");
+// }
+// var indexedDB = window.indexedDB;
+
+var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 
 //indicamos el nombre y la versión
 var dataBase = indexedDB.open("offline_db", 1);
-
 
 //se ejecuta la primera vez que se crea la estructura
 //o se cambia la versión de la base de datos.
@@ -10,7 +14,7 @@ dataBase.onupgradeneeded = function (e) {
     console.log("Creating polls table");
 
     //obteniendo la conexión activa
-    active = dataBase.result;
+    var active = dataBase.result;
 
     //creando la colección:
     //En este caso, la colección, tendrá un ID autogenerado.
@@ -30,28 +34,43 @@ dataBase.onerror = function (e) {
     console.error('Something happened in the process: '+e.target.errorCode);
 };
 
-
 function addPoll() {
-    var dbActiva = dataBase.result;
+    console.log("Adding poll...");
 
+
+    var dbActiva = dataBase.result;
     var transaccion = dbActiva.transaction(["polls"], "readwrite");
+    var polls = transaccion.objectStore("polls");
+
 
     transaccion.onerror = function (e) {
         alert(request.error.name + '\n\n' + request.error.message);
     };
 
-    transaccion.oncomplete = function (e) {
+    transaccion.oncompvare = function (e) {
 
         console.log("Object added successfully");
     };
 
-    var polls = transaccion.objectStore("polls");
+    var lat = 0, lng = 0;
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            lat = position.coords.latitude;
+            lng = position.coords.longitude;
+        });
+    } else {
+        alert("Geolocation is not supported by this browser. Registro cancelado");
+        return;
+    }
 
     var request = polls.put({
         firstName: document.querySelector("#firstName").value,
         lastName: document.querySelector("#lastName").value,
         sector: document.querySelector("#sector").value,
-        education: document.querySelector("#education").value
+        education: document.querySelector("#education").value,
+        date: formatDate(new Date()),
+        latitude: lat,
+        longitude: lng
     });
 
     request.onerror = function (e) {
@@ -61,7 +80,7 @@ function addPoll() {
     };
 
     request.onsuccess = function (e) {
-        console.log("Data temporary persisted successfully");
+        console.log("Data temporary persisted successfully!");
         document.querySelector("#firstName").value = "";
         document.querySelector("#lastName").value = "";
         document.querySelector("#sector").value = "";
@@ -71,7 +90,7 @@ function addPoll() {
 
 }
 
-function updatePoll() {
+function updatePoll(pollid) {
 
     //recuperando la matricula.
     // var matricula = prompt("Indique la matrícula");
@@ -85,7 +104,7 @@ function updatePoll() {
     var polls = data.objectStore("polls");
 
     //buscando estudiante por la referencia al key.
-    polls.get(""+document.querySelector("#firstName").value + " "+ document.querySelector("#lastName").value).onsuccess = function(e) {
+    polls.get(""+pollid).onsuccess = function(e) {
 
         var resultado = e.target.result;
         console.log("los datos: "+JSON.stringify(resultado));
@@ -102,13 +121,13 @@ function updatePoll() {
             //eventos.
             solicitudUpdate.onsuccess = function (e) {
                 console.log("Datos Actualizados....");
-            }
+            };
 
             solicitudUpdate.onerror = function (e) {
                 console.error("Error Datos Actualizados....");
-            }
+            };
 
-        }else{
+        } else {
             console.log("Estudiante no encontrado...");
         }
     };
@@ -116,76 +135,14 @@ function updatePoll() {
 
 }
 
-/**
- * Envia la información de una lista de encuestas al servidor.
- *
- * Referencias para hacer esta función en: https://www.w3schools.com/js/js_ajax_intro.asp
- * https://www.w3schools.com/jsref/prop_nav_online.asp
- * https://developer.mozilla.org/es/docs/Web/API/NavigatorOnLine/onLine
- * @param polls
- */
-function sincronize(polls) {
-    if (navigator.onLine) {
-        let xhttp = new XMLHttpRequest();
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
 
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                console.log(this.responseText);
-            }
-        };
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
 
-        // Se abre un request tipo POST a la ruta /poll de forma Asynchronous  (el ultimo parametro true)
-        xhttp.open("POST", "/poll", true);
-        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-        for (let poll in polls) {
-            // Manda un request al servidor en la ruta "/poll" con metodo POST
-            xhttp.send(
-                "firstName="+poll.firstName+
-                "&lastName="+poll.lastName+
-                "&sector="+poll.sector+
-                "&education="+poll.education+
-                "&date="+poll.date+
-                "&latitude="+poll.latitude+
-                "&longitude="+poll.longitude
-            );
-
-            // Remueve el elemento correspondiente en el DOM
-            document.getElementById("poll-"+poll.id).remove();
-        }
-    } else {
-        alert("No tiene conexión a internet, intente más tarde.");
-    }
-}
-
-/**
- * Presenta cada elemento de una lista de encuesta en un formato prestablecido para presentar en el DOM
- * @param polls
- */
-function printPoll(polls) {
-    let container = document.getElementById("pollsStaged");
-
-    for (let poll in polls) {
-        let card = document.createElement("div");
-
-        card.innerHTML =
-        "<div id=\"poll-\"" + poll.id + " class=\"card mx-auto mb-4 limit-width-on-lg-screen\">\n" +
-        "    <div class=\"card-header\">\n" +
-        "        <h4 class=\"card-title\">Encuesta #" + poll.id + "</h4>\n" +
-        "        <h6 class=\"card-subtitle text-muted\">"+poll.date+"</h6>\n" +
-        "    </div>\n" +
-        "    <div class=\"card-body\">\n" +
-        "        <p class=\"card-text\">Nombres: " + poll.firstName + "</p>\n" +
-        "        <p class=\"card-text\">Apellidos: " + poll.lastName + "</p>\n" +
-        "        <p class=\"card-text\">Sector: " + poll.sector + "</p>\n" +
-        "        <p class=\"card-text\">Nivel de educación: " + poll.education + "</p>\n" +
-        "    </div>\n" +
-            "    <div class=\"card-footer\">\n" +
-            "        <a class=\"btn-secondary\" href=\'#\'>Editar</a>\n" +
-            "        <a class=\'btn-danger\' href=\'#\'>Borrar</a>\n" +
-            "    </div>\n" +
-        "</div>"
-
-        container.appendChild(card);
-    }
+    return [year, month, day].join('-');
 }
