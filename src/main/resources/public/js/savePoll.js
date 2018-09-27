@@ -35,59 +35,55 @@ dataBase.onerror = function (e) {
 };
 
 function addPoll() {
-    console.log("Adding poll...");
+    if ("geolocation" in navigator) {
+        console.log("Adding poll...");
 
-
-    var dbActiva = dataBase.result;
-    var transaccion = dbActiva.transaction(["polls"], "readwrite");
-    var polls = transaccion.objectStore("polls");
-
-
-    transaccion.onerror = function (e) {
-        alert(request.error.name + '\n\n' + request.error.message);
-    };
-
-    transaccion.oncompvare = function (e) {
-
-        console.log("Object added successfully");
-    };
-
-    var lat = 0, lng = 0;
-    if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
-            lat = position.coords.latitude;
-            lng = position.coords.longitude;
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+
+            var dbActiva = dataBase.result;
+            var transaccion = dbActiva.transaction(["polls"], "readwrite");
+            var polls = transaccion.objectStore("polls");
+
+            transaccion.onerror = function (e) {
+                alert(request.error.name + '\n\n' + request.error.message);
+            };
+
+            transaccion.oncomplete = function (e) {
+                console.log("Object added successfully");
+            };
+
+            var request = polls.put({
+                firstName: document.querySelector("#firstName").value,
+                lastName: document.querySelector("#lastName").value,
+                sector: document.querySelector("#sector").value,
+                education: document.querySelector("#education").value,
+                date: formatDate(new Date()),
+                latitude: lat,
+                longitude: lng
+            });
+
+
+            request.onerror = function (e) {
+                var mensaje = "Error: "+e.target.errorCode;
+                console.error(mensaje);
+                alert(mensaje)
+            };
+
+            request.onsuccess = function (e) {
+                console.log("Data temporary persisted successfully!");
+                document.querySelector("#firstName").value = "";
+                document.querySelector("#lastName").value = "";
+                document.querySelector("#sector").value = "";
+                document.querySelector("#education").value = "";
+            };
+
+            console.log("Tú localizacion es: " + lat + " " + lng);
         });
-    } else {
+} else {
         alert("Geolocation is not supported by this browser. Registro cancelado");
-        return;
     }
-
-    var request = polls.put({
-        firstName: document.querySelector("#firstName").value,
-        lastName: document.querySelector("#lastName").value,
-        sector: document.querySelector("#sector").value,
-        education: document.querySelector("#education").value,
-        date: formatDate(new Date()),
-        latitude: lat,
-        longitude: lng
-    });
-
-    request.onerror = function (e) {
-        var mensaje = "Error: "+e.target.errorCode;
-        console.error(mensaje);
-        alert(mensaje)
-    };
-
-    request.onsuccess = function (e) {
-        console.log("Data temporary persisted successfully!");
-        document.querySelector("#firstName").value = "";
-        document.querySelector("#lastName").value = "";
-        document.querySelector("#sector").value = "";
-        document.querySelector("#education").value = "";
-    };
-
-
 }
 
 function updatePoll(pollid) {

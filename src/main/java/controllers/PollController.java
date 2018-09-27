@@ -1,5 +1,7 @@
 package controllers;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import encapsulation.EducationLevel;
 import entities.Poll;
 import service.PollService;
@@ -10,9 +12,9 @@ import spark.Route;
 import util.Path;
 import main.Main;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class PollController {
 
@@ -31,38 +33,26 @@ public class PollController {
     };
 
     public static Route pollCreatePost = (Request req, Response res) -> {
-        Poll poll = new Poll();
-        String educationValue = req.queryParams("education");
-        EducationLevel educationLevel = EducationLevel.valueOf(educationValue.toUpperCase());
-        poll.setFirstName(req.queryParams("firstName"));
-        poll.setLastName(req.queryParams("lastName"));
+        String pollsJSONstring = req.body();
+        Type listType = new TypeToken<ArrayList<Map<String, String>>>() {} .getType();
+        List<Map<String, String>> pollsList = new Gson().fromJson(pollsJSONstring, listType);
 
-        switch (educationLevel) {
-            case PRIMARY:
-                poll.setEducationLevel(EducationLevel.PRIMARY);
-                break;
-            case SECONDARY:
-                poll.setEducationLevel(EducationLevel.SECONDARY);
-                break;
-            case UNIVERSITY:
-                poll.setEducationLevel(EducationLevel.UNIVERSITY);
-                break;
-            case MASTER:
-                poll.setEducationLevel(EducationLevel.MASTER);
-                break;
-            case DOCTORATE:
-                poll.setEducationLevel(EducationLevel.DOCTORATE);
-                break;
+        for (Map<String, String> pollElement :
+                pollsList) {
+            Poll poll = new Poll();
+            poll.setFirstName(pollElement.get("firstName"));
+            poll.setLastName(pollElement.get("lastName"));
+            poll.setSector(pollElement.get("sector"));
+            poll.setDate(new SimpleDateFormat("yyyy-MM-dd").parse(pollElement.get("date")));
+            poll.setEducationLevel(EducationLevel.valueOf(pollElement.get("education").toUpperCase()));
+            poll.setLatitude(Double.parseDouble(pollElement.get("latitude")));
+            poll.setLongitude(Long.parseLong(pollElement.get("longitude")));
+
+            pollService.persist(poll);
         }
 
-        poll.setSector(req.queryParams("sector"));
-        poll.setDate(new Date());
-        //  Agregar la latitud y longitud
-
-        pollService.persist(poll);
-
         res.redirect("/");
-        return "Encuesta registrado con exito:\nFecha: "+poll.getDate()+"\nNombre: "+poll.getFirstName()+"\nSector: "+poll.getSector()+"\n";
+        return "Encuesta registradas con exito!";
 
     };
 
@@ -88,4 +78,25 @@ public class PollController {
         res.redirect("/");
         return null;
     };
+
+//    private EducationLevel getEducationEnumValue(String educationString) {
+//        EducationLevel educationLevel = ;
+//        switch (educationLevel) {
+//            case PRIMARY:
+//                poll.setEducationLevel(EducationLevel.PRIMARY);
+//                break;
+//            case SECONDARY:
+//                poll.setEducationLevel(EducationLevel.SECONDARY);
+//                break;
+//            case UNIVERSITY:
+//                poll.setEducationLevel(EducationLevel.UNIVERSITY);
+//                break;
+//            case MASTER:
+//                poll.setEducationLevel(EducationLevel.MASTER);
+//                break;
+//            case DOCTORATE:
+//                poll.setEducationLevel(EducationLevel.DOCTORATE);
+//                break;
+//        }
+//    }
 }
