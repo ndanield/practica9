@@ -38,7 +38,7 @@
             </div>
         </fieldset>
         <div class="card-footer">
-            <button class="btn btn-success mx-auto" type="submit" onclick="addPoll(); alert('Encuesta registrada.')">Registrar</button>
+            <button class="btn btn-success mx-auto" onclick="addPoll(); alert('Encuesta registrada.')">Registrar</button>
         </div>
     </div>
 

@@ -16,16 +16,38 @@ DBOpenRequest.onerror = function (e) {
     console.error('Something happened in the process: ' + e.target.errorCode);
 };
 
-
 function listPolls() {
-    findAll(printPolls)
+    var db = DBOpenRequest.result;
+    //por defecto si no lo indico el tipo de transacción será readonly
+    var transaction = db.transaction(["polls"]);
+    // Creo un espacio de alamacenamiento un Object Store llamado polls
+    var polls = transaction.objectStore("polls");
+
+    polls.getAll().onsuccess = function (ev) {
+        console.log(ev.target.result);
+        printPolls(ev.target.result);
+    }
+    polls.getAll().onerror = function(ev) {
+        console.error("Error listando");
+    }
 }
 
 /***
  * Solo debe ser llamado cuando ya el evento del indexDB "onsuccess" halla sido disparado
  */
 function syncPost() {
-    findAll(synchronize)
+    var db = DBOpenRequest.result;
+    //por defecto si no lo indico el tipo de transacción será readonly
+    var transaction = db.transaction(["polls"]);
+    // Creo un espacio de alamacenamiento un Object Store llamado polls
+    var polls = transaction.objectStore("polls");
+
+    polls.getAll().onsuccess = function (ev) {
+        synchronize(ev.target.result);
+    }
+    polls.getAll().onerror = function(ev) {
+        console.error("Error listando");
+    }
 }
 
 /**
@@ -38,11 +60,11 @@ function printPolls(polls) {
 
     for (var key in polls) {
         var card = document.createElement("div");
-        console.log("Estoy en el loop : " + card.innerHTML);
+
         card.innerHTML =
             "<div id=\"poll-\"" + polls[key].id + " class=\"card mx-auto mb-4 limit-width-on-lg-screen\">\n" +
             "    <div class=\"card-header\">\n" +
-            "        <h4 class=\"card-title\">Encuesta #" +polls[key].id + "</h4>\n" +
+            "        <h4 class=\"card-title\">Registro de encuesta #" +polls[key].id + "</h4>\n" +
             "        <h6 class=\"card-subtitle text-muted\">"+polls[key].date+"</h6>\n" +
             "    </div>\n" +
             "    <div class=\"card-body\">\n" +
@@ -52,13 +74,11 @@ function printPolls(polls) {
             "        <p class=\"card-text\">Nivel de educación: " +polls[key].education + "</p>\n" +
             "    </div>\n" +
             "    <div class=\"card-footer\">\n" +
-            "        <a class=\"btn btn-secondary\" href=\'#\' onclick=\'updatePoll(" +polls[key].id + ")\'>Editar</a>\n" +
-            "        <a class=\'btn btn-danger\' href=\'#\'>Borrar</a>\n" +
+            "        <button class=\"btn btn-secondary\" onclick=\'updatePoll(" +polls[key].id + ")\'>Editar</button>\n" +
+            "        <button class=\'btn btn-danger\' onclick=\'deletePoll("+ polls[key].id +")\'>Borrar</button>\n" +
             "    </div>\n" +
             "</div>"
-        console.log("Estoy al final en el loop : " + card.innerHTML);
         container.appendChild(card);
-        console.log("Resultado: " + container.innerHTML);
     }
 }
 
@@ -141,39 +161,5 @@ function deleteAll() {
     //Una vez que se realiza la operación llamo la impresión.
     transaction.oncomplete = function () {
         console.log("Todo borrado patron!");
-    };
-}
-
-function findAll(callback) {
-    var db = DBOpenRequest.result;
-    //por defecto si no lo indico el tipo de transacción será readonly
-    var transaction = db.transaction(["polls"]);
-    // Creo un espacio de alamacenamiento un Object Store llamado polls
-    var polls = transaction.objectStore("polls");
-
-    var counter = 0;
-    var polls_recovered=[];
-
-    //abriendo el cursor.
-    polls.openCursor().onsuccess=function(e) {
-        //recuperando la posicion del cursor
-        var cursor = e.target.result;
-        if(cursor){
-            counter++;
-            //recuperando el objeto.
-            polls_recovered.push(cursor.value);
-
-            //Función que permite seguir recorriendo el cursor.
-            cursor.continue();
-
-        } else {
-            console.log("La cantidad de registros recuperados es: "+counter);
-        }
-    };
-
-    //Una vez que se realiza la operación llamo la impresión.
-    transaction.oncomplete = function () {
-        console.log("Lista de encuesta recuperadas: " + JSON.stringify(polls_recovered));
-        callback(polls_recovered);
     };
 }

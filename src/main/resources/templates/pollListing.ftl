@@ -7,7 +7,7 @@
             <div class="card mx-auto mb-4 limit-width-on-lg-screen">
                 <div class="card-header">
                     <h4 class="card-title">Encuesta #${ poll.id }</h4>
-                    <h6 class="card-subtitle text-muted">${ poll.date}</h6>
+                    <h6 class="card-subtitle text-muted">${ poll.date }</h6>
                 </div>
                 <div class="card-body">
                     <p class="card-text">Nombres: ${ poll.firstName }</p>

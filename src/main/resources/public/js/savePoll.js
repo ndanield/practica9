@@ -1,7 +1,21 @@
-// if (!window.indexedDB) {
-//     window.alert("Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.");
-// }
-// var indexedDB = window.indexedDB;
+
+document.addEventListener("DOMContentLoaded", function() {
+    if (storageAvailable('localStorage') && 'geolocation' in navigator) {
+        // Yippee! We can use localStorage awesomeness
+        navigator.geolocation.getCurrentPosition(function (position) {
+            // Guardo las coordenadas en este formato
+            localStorage.setItem('location', JSON.stringify({
+                coords: {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                }
+            }));
+        });
+    }
+    else {
+        console.log("LocalStorage not available");
+    }
+});
 
 var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 
@@ -25,7 +39,6 @@ dataBase.onupgradeneeded = function (e) {
 
 };
 
-//El evento que se dispara una vez, lo
 dataBase.onsuccess = function (e) {
     console.log('Process executed successfully');
 };
@@ -36,71 +49,24 @@ dataBase.onerror = function (e) {
 
 function addPoll() {
     if ("geolocation" in navigator) {
-        console.log("Adding poll...");
-
-        navigator.geolocation.getCurrentPosition(function(position) {
-            var lat = position.coords.latitude;
-            var lng = position.coords.longitude;
-
-            var dbActiva = dataBase.result;
-            var transaccion = dbActiva.transaction(["polls"], "readwrite");
-            var polls = transaccion.objectStore("polls");
-
-            transaccion.onerror = function (e) {
-                alert(request.error.name + '\n\n' + request.error.message);
-            };
-
-            transaccion.oncomplete = function (e) {
-                console.log("Object added successfully");
-            };
-
-            var request = polls.put({
-                firstName: document.querySelector("#firstName").value,
-                lastName: document.querySelector("#lastName").value,
-                sector: document.querySelector("#sector").value,
-                education: document.querySelector("#education").value,
-                date: formatDate(new Date()),
-                latitude: lat,
-                longitude: lng
-            });
-
-
-            request.onerror = function (e) {
-                var mensaje = "Error: "+e.target.errorCode;
-                console.error(mensaje);
-                alert(mensaje)
-            };
-
-            request.onsuccess = function (e) {
-                console.log("Data temporary persisted successfully!");
-                document.querySelector("#firstName").value = "";
-                document.querySelector("#lastName").value = "";
-                document.querySelector("#sector").value = "";
-                document.querySelector("#education").value = "";
-            };
-
-            console.log("Tú localizacion es: " + lat + " " + lng);
-        });
-} else {
+        if (navigator.onLine) {
+            navigator.geolocation.getCurrentPosition(savePoll);
+        } else {
+            var position = JSON.parse(localStorage.getItem('location'));
+            savePoll(position);
+        }
+    } else {
         alert("Geolocation is not supported by this browser. Registro cancelado");
     }
 }
 
 function updatePoll(pollid) {
 
-    //recuperando la matricula.
-    // var matricula = prompt("Indique la matrícula");
-    // console.log("matricula digitada: "+matricula);
-
-    // var nombre = prompt("Indique el nombre");
-    // console.log("el nombre digitada: "+nombre);
-
-    //abriendo la transacción en modo escritura.
     var data = dataBase.result.transaction(["polls"],"readwrite");
     var polls = data.objectStore("polls");
 
     //buscando estudiante por la referencia al key.
-    polls.get(""+pollid).onsuccess = function(e) {
+    polls.get(pollid).onsuccess = function(e) {
 
         var resultado = e.target.result;
         console.log("los datos: "+JSON.stringify(resultado));
@@ -124,11 +90,64 @@ function updatePoll(pollid) {
             };
 
         } else {
-            console.log("Estudiante no encontrado...");
+            console.log("Encuesta no encontrada...");
         }
     };
 
+}
 
+function deletePoll(pollid) {
+    var data = dataBase.result.transaction(["polls"],"readwrite");
+    var polls = data.objectStore("polls");
+
+    //buscando estudiante por la referencia al key.
+    polls.delete(pollid).onsuccess = function(e) {
+        console.log("Dato borrados?....");
+    };
+}
+
+function savePoll(position) {
+    var lat = position.coords.latitude;
+    var lng = position.coords.longitude;
+
+    var dbActiva = dataBase.result;
+    var transaccion = dbActiva.transaction(["polls"], "readwrite");
+    var polls = transaccion.objectStore("polls");
+
+    transaccion.onerror = function (e) {
+        alert(request.error.name + '\n\n' + request.error.message);
+    };
+
+    transaccion.oncomplete = function (e) {
+        console.log("Object added successfully");
+    };
+
+    var request = polls.put({
+        firstName: document.querySelector("#firstName").value,
+        lastName: document.querySelector("#lastName").value,
+        sector: document.querySelector("#sector").value,
+        education: document.querySelector("#education").value,
+        date: formatDate(new Date()),
+        latitude: lat,
+        longitude: lng
+    });
+
+
+    request.onerror = function (e) {
+        var mensaje = "Error: " + e.target.errorCode;
+        console.error(mensaje);
+        alert(mensaje)
+    };
+
+    request.onsuccess = function (e) {
+        console.log("Data temporary persisted successfully!");
+        document.querySelector("#firstName").value = "";
+        document.querySelector("#lastName").value = "";
+        document.querySelector("#sector").value = "";
+        document.querySelector("#education").value = "";
+    };
+
+    console.log("Tú localizacion es: " + lat + " " + lng);
 }
 
 function formatDate(date) {
@@ -141,4 +160,28 @@ function formatDate(date) {
     if (day.length < 2) day = '0' + day;
 
     return [year, month, day].join('-');
+}
+
+function storageAvailable(type) {
+    try {
+        var storage = window[type],
+            x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+    }
+    catch(e) {
+        return e instanceof DOMException && (
+                // everything except Firefox
+            e.code === 22 ||
+            // Firefox
+            e.code === 1014 ||
+            // test name field too, because code might not be present
+            // everything except Firefox
+            e.name === 'QuotaExceededError' ||
+            // Firefox
+            e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+            // acknowledge QuotaExceededError only if there's something already stored
+            storage.length !== 0;
+    }
 }

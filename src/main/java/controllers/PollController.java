@@ -46,7 +46,7 @@ public class PollController {
             poll.setDate(new SimpleDateFormat("yyyy-MM-dd").parse(pollElement.get("date")));
             poll.setEducationLevel(EducationLevel.valueOf(pollElement.get("education").toUpperCase()));
             poll.setLatitude(Double.parseDouble(pollElement.get("latitude")));
-            poll.setLongitude(Long.parseLong(pollElement.get("longitude")));
+            poll.setLongitude(Double.parseDouble(pollElement.get("longitude")));
 
             pollService.persist(poll);
         }
