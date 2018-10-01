@@ -2,12 +2,13 @@
 <#import "base.ftl" as b>
 
 <@b.base>
-    <div id="pollsLocations" class="card mx-auto limit-width-on-lg-screen">
-        <div class="card-header">
-            Ubicaciones de las encuestas
-        </div>
-        <div id="googleMap" style="width:100%;height:400px;"></div>
-    </div>
+    <#--<div id="pollsLocations" class="card mx-auto limit-width-on-lg-screen">-->
+        <#--<div class="card-header">-->
+            <#--Ubicaciones de las encuestas-->
+        <#--</div>-->
+        <#---->
+    <#--</div>-->
+<div id="googleMap" style="width:100%;height:400px;"></div>
 </@b.base>
 
 
@@ -21,17 +22,24 @@
 
         console.log(coords);
 
+        var myLatLng = {lat: 19.470587, lng: -70.693633};
+
+
         var mapProp = {
-            center: {lat: 19.470587, lng: -70.693633},
+            center: myLatLng,
             zoom: 8,
             streetViewControl: false,
             fullscreenControl: false
         };
+
         var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
 
-        for(var coord in coords) {
-            var marker = new google.maps.Marker({position: coord});
-            marker.setMap(map);
+        for(var i in coords) {
+            placeMarker(map, coords[i]);
+            // var marker = new google.maps.Marker({
+            //     position: coord
+            // });
+            // marker.setMap(map);
         }
     }
 

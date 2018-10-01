@@ -24,9 +24,14 @@ public class Main {
         freemarkerEngine = new FreeMarkerEngine(configuration);
 
         get("/", PollController.pollStagedGet);
-        get("/poll", "application/json", PollController.pollCreateGet);
+
+        get("/poll", PollController.pollCreateGet);
         post("/poll", PollController.pollCreatePost);
+
+        get("/poll/edit/:id", PollController.pollEditGet);
+
         get("/location", PollController.pollLocationGet);
+
         get("/polls", PollController.pollListingGet);
 
     }

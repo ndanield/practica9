@@ -12,6 +12,6 @@
 </@b.base>
 
 <#-- Por las actualizaciones y borrado individual de una encuesta-->
-<script src="js/savePoll.js"></script>
+<script src="/js/savePoll.js"></script>
 <#-- Para mostrar las encuestas y sincronizarlas -->
-<script src="js/showPoll.js"></script>
+<script src="/js/showPoll.js"></script>

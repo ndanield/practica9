@@ -56,6 +56,14 @@ public class PollController {
 
     };
 
+    public static Route pollEditGet = (Request req, Response res) -> {
+        Map<String, Object> model = new HashMap<>();
+        model.put("title", "Editando encuesta");
+        int pollIndexedDBId = Integer.parseInt(req.params("id"));
+        model.put("pollIndexDBId", pollIndexedDBId);
+        return Main.freemarkerEngine.render(new ModelAndView(model, Path.POLL_EDIT));
+    };
+
     public static Route pollListingGet = (Request req, Response res) -> {
         Map<String, Object> model = new HashMap<>();
 
@@ -68,15 +76,11 @@ public class PollController {
     public static Route pollLocationGet = (req, res) -> {
         Map<String, Object> model = new HashMap<>();
 
+        List<Poll> allPolls = pollService.findAll();
         model.put("title", "Ubicaciones");
-        model.put("polls", pollService.findAll());
+        model.put("polls", allPolls);
 
         return Main.freemarkerEngine.render(new ModelAndView(model, Path.POLL_LOCATION));
-    };
-
-    public static Route pollLocationPost = (req, res) -> {
-        res.redirect("/");
-        return null;
     };
 
 //    private EducationLevel getEducationEnumValue(String educationString) {

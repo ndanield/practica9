@@ -103,6 +103,8 @@ function deletePoll(pollid) {
     //buscando estudiante por la referencia al key.
     polls.delete(pollid).onsuccess = function(e) {
         console.log("Dato borrados?....");
+        var poll = document.getElementById("poll-" + pollid);
+        poll.parentNode.removeChild(poll);
     };
 }
 
@@ -144,7 +146,6 @@ function savePoll(position) {
         document.querySelector("#firstName").value = "";
         document.querySelector("#lastName").value = "";
         document.querySelector("#sector").value = "";
-        document.querySelector("#education").value = "";
     };
 
     console.log("Tú localizacion es: " + lat + " " + lng);

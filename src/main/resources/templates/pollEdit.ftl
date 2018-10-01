@@ -1,3 +1,4 @@
+<#-- @ftlvariable name="pollIndexDBId" type="int" -->
 <#import "base.ftl" as b>
 
 <@b.base>
@@ -6,14 +7,14 @@
             <div class="form-group row">
                 <label for="firstName" class="col-sm-4 col-form-label"> Nombres</label>
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" placeholder="Nombres" id="firstName"  name="firstName">
+                    <input type="text" class="form-control" placeholder="Nombres" id="firstName"  name="firstName" >
                 </div>
             </div>
 
             <div class="form-group row">
                 <label for="lastName" class="col-sm-4 col-form-label"> Apellidos</label>
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" placeholder="Apellidos" id="lastName"  name="lastName">
+                    <input type="text" class="form-control" placeholder="Apellidos" id="lastName"  name="lastName" >
                 </div>
             </div>
 
@@ -38,10 +39,15 @@
             </div>
         </fieldset>
         <div class="card-footer">
-            <button class="btn btn-success mx-auto" onclick="addPoll(); alert('Encuesta registrada.')">Registrar</button>
+            <button class="btn btn-success mx-auto" onclick="updatePoll(${ pollIndexDBId }); alert('Encuesta editada.'); location.href='/'">Guardar</button>
         </div>
     </div>
-
 </@b.base>
 
+<script>
+    document.querySelector("#firstName").value = ${poll.firstName};
+    document.querySelector("#lastName").value = ${poll.lastName};
+    document.querySelector("#sector").value = ${poll.sector};
+    document.querySelector("#education").value = ${poll.education};
+</script>
 <script src="/js/savePoll.js"></script>

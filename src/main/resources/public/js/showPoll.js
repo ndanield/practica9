@@ -44,10 +44,10 @@ function syncPost() {
 
     polls.getAll().onsuccess = function (ev) {
         synchronize(ev.target.result);
-    }
+    };
     polls.getAll().onerror = function(ev) {
         console.error("Error listando");
-    }
+    };
 }
 
 /**
@@ -62,7 +62,7 @@ function printPolls(polls) {
         var card = document.createElement("div");
 
         card.innerHTML =
-            "<div id=\"poll-\"" + polls[key].id + " class=\"card mx-auto mb-4 limit-width-on-lg-screen\">\n" +
+            "<div id=\"poll-" + polls[key].id + "\" class='card mx-auto mb-4 limit-width-on-lg-screen'>\n" +
             "    <div class=\"card-header\">\n" +
             "        <h4 class=\"card-title\">Registro de encuesta #" +polls[key].id + "</h4>\n" +
             "        <h6 class=\"card-subtitle text-muted\">"+polls[key].date+"</h6>\n" +
@@ -73,8 +73,8 @@ function printPolls(polls) {
             "        <p class=\"card-text\">Sector: " +polls[key].sector + "</p>\n" +
             "        <p class=\"card-text\">Nivel de educación: " +polls[key].education + "</p>\n" +
             "    </div>\n" +
-            "    <div class=\"card-footer\">\n" +
-            "        <button class=\"btn btn-secondary\" onclick=\'updatePoll(" +polls[key].id + ")\'>Editar</button>\n" +
+            "    <div class=\"card-footer\">\n        " +
+            "         <a href='/poll/edit/" + polls[key].id +"' class=\"btn btn-secondary\">Editar</a>\n" +
             "        <button class=\'btn btn-danger\' onclick=\'deletePoll("+ polls[key].id +")\'>Borrar</button>\n" +
             "    </div>\n" +
             "</div>"
@@ -120,6 +120,7 @@ function synchronize(polls) {
         }
 
     } else {
+        console.log("No hay conexion");
         alert("No tiene conexión a internet, intente más tarde.");
     }
 }

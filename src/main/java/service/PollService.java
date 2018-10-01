@@ -81,7 +81,7 @@ public class PollService {
 
     public List<Poll> findAll() {
         EntityManager em = emf.createEntityManager();
-        try{
+        try {
             CriteriaQuery<Poll> criteriaQuery = em.getCriteriaBuilder().createQuery(entityClass);
             criteriaQuery.select(criteriaQuery.from(entityClass));
             return em.createQuery(criteriaQuery).getResultList();
